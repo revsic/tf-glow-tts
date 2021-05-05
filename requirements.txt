@@ -1,0 +1,8 @@
+tensorflow==2.2.0
+# WARNING: addons must suite the tensorflow version
+tensorflow-addons==0.11.2
+tensorflow-datasets==4.1.0
+tqdm==4.54.1
+numpy==1.19.2
+matplotlib==3.3.2
+GitPython==3.1.11
