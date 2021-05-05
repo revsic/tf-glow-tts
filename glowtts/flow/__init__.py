@@ -29,7 +29,7 @@ class WaveNetFlow(tf.keras.Model):
         self.flows = []
         for _ in range(config.flow_block_num):
             self.flows.extend([
-                ActNorm(),
+                ActNorm(config.neck),
                 Inv1x1Conv(config.flow_groups),
                 AffineCoupling(
                     config.neck,
