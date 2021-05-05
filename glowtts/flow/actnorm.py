@@ -6,11 +6,15 @@ import tensorflow as tf
 class ActNorm(tf.keras.Model):
     """Activation normalization.
     """
-    def __init__(self):
+    def __init__(self, channels: int):
         """Initializer.
+        Args:
+            channels: size of the input channels.
         """
         super().__init__()
         self.init = tf.Variable(0., trainable=False)
+        self.mean = tf.Variable(tf.zeros([channels]))
+        self.logstd = tf.Variable(tf.zeros([channels]))
     
     def ddi(self, inputs: tf.Tensor, mask: tf.Tensor):
         """Data-dependent initialization.
@@ -27,8 +31,8 @@ class ActNorm(tf.keras.Model):
         # [C]
         logstd = 0.5 * tf.math.log(tf.maximum(variance, 1e-5))
         # initialize
-        self.mean = tf.Variable(mean, trainable=True)
-        self.logstd = tf.Variable(logstd, trainable=True)
+        self.mean.assign(mean)
+        self.logstd.assign(logstd)
         self.init.assign(1.)
 
     def call(self, inputs: tf.Tensor, mask: tf.Tensor) \
