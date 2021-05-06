@@ -255,7 +255,7 @@ class GlowTTS(tf.keras.Model):
             # [B, S]
             prev = tf.pad(prob, [[0, 0], [1, 0]],
                           mode='CONSTANT',
-                          constant_values=-np.inf)[:, :-1]
+                          constant_values=tf.float32.min)[:, :-1]
             cur = prob
             # larger value mask
             max_mask = cur >= prev
@@ -288,7 +288,7 @@ class GlowTTS(tf.keras.Model):
             # [B]
             index = index + dir - 1
         # [B, T, S]
-        return tf.stack(attn, axis=1) * mask
+        return tf.stack(attn[::-1], axis=1) * mask
 
     def write(self, path: str,
               optim: Optional[tf.keras.optimizers.Optimizer] = None):
