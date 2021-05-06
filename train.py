@@ -64,7 +64,7 @@ class Trainer:
         step = epoch * self.split
         for epoch in tqdm.trange(epoch, self.config.train.epoch):
             with tqdm.tqdm(total=self.split, leave=False) as pbar:
-                for iter, (text, mel, textlen, mellen) in enumerate(self.trainset):
+                for text, mel, textlen, mellen in self.trainset:
                     with tf.GradientTape() as tape:
                         # tape.watch(self.model.trainable_variables)
                         loss, losses, attn = \
