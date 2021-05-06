@@ -25,7 +25,7 @@ class Config:
         self.eps = 1e-5
 
         # sample size
-        self.batch = 32
+        self.batch = 16
 
     def window_fn(self) -> Callable:
         """Return window generator.
