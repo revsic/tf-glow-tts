@@ -17,7 +17,7 @@ class TrainConfig:
         self.lr_policy = 'noam'
         self.lr_params = {
             'learning_rate': 1,
-            'warmup_steps': 1000,
+            'warmup_steps': 4000,
             'channels': 160
         }
         # self.lr_policy = 'piecewise'
