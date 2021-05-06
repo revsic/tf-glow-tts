@@ -100,7 +100,7 @@ class Trainer:
 
                         if (iter + 1) % (self.split // 2) == 0:
                             tf.summary.image(
-                                'align/measure', self.align_img(attn), step)
+                                'align/mas', self.align_img(attn), step)
 
             self.model.write(
                 '{}_{}.ckpt'.format(self.ckpt_path, epoch), self.optim)
@@ -111,7 +111,7 @@ class Trainer:
                     tf.summary.scalar('loss/' + key, value, step)
 
                 tf.summary.image(
-                    'align/measure', self.align_img(align), step)
+                    'align/mas', self.align_img(align), step)
 
                 mel, pmel, align = self.evaluate()
                 tf.summary.image(
@@ -119,7 +119,7 @@ class Trainer:
                 tf.summary.image(
                     'mel/eval', self.mel_img(pmel[None]), step)
                 tf.summary.image(
-                    'align/text2mel', self.align_img(align[None]), step)
+                    'align/duration', self.align_img(align[None]), step)
 
                 del text, mel, pmel, align, textlen, mellen
 
