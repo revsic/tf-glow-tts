@@ -97,10 +97,8 @@ class Trainer:
                             lr = lr(step)
                         tf.summary.scalar('common/lr', lr, step)
                         tf.summary.scalar('common/grad norm', norm, step)
-
-                        if (iter + 1) % (self.split // 2) == 0:
-                            tf.summary.image(
-                                'align/mas', self.align_img(attn), step)
+                        tf.summary.image(
+                            'align/mas', self.align_img(attn), step, max_outputs=1)
 
             self.model.write(
                 '{}_{}.ckpt'.format(self.ckpt_path, epoch), self.optim)
@@ -111,7 +109,7 @@ class Trainer:
                     tf.summary.scalar('loss/' + key, value, step)
 
                 tf.summary.image(
-                    'align/mas', self.align_img(align), step)
+                    'align/mas', self.align_img(align), step, max_outputs=1)
 
                 mel, pmel, align = self.evaluate()
                 tf.summary.image(
