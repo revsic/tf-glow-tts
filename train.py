@@ -30,14 +30,17 @@ class Trainer:
         self.ttsdata = ttsdata
         self.config = config
 
-        self.split = config.train.split // config.data.batch
-        trainset, testset = self.ttsdata.dataset(self.split)
+        trainset, testset = self.ttsdata.dataset(config.train.split)
         self.trainset = trainset.cache() \
             .shuffle(config.train.bufsiz) \
             .prefetch(tf.data.experimental.AUTOTUNE)
         self.testset = testset.cache() \
             .prefetch(tf.data.experimental.AUTOTUNE)
-        self.testsize = tf.data.experimental.cardinality(self.testset).numpy().item()
+
+        self.trainsize = tf.data.experimental.cardinality(
+            self.trainset).numpy().item()
+        self.testsize = tf.data.experimental.cardinality(
+            self.testset).numpy().item()
 
         self.optim = tf.keras.optimizers.Adam(
             config.train.lr(),
@@ -61,10 +64,10 @@ class Trainer:
         Args:
             epoch: starting epoch.
         """
-        step = epoch * self.split
+        step = epoch * self.trainsize
         for epoch in tqdm.trange(epoch, self.config.train.epoch):
-            with tqdm.tqdm(total=self.split, leave=False) as pbar:
-                for text, mel, textlen, mellen in self.trainset:
+            with tqdm.tqdm(total=self.trainsize, leave=False) as pbar:
+                for iter, (text, mel, textlen, mellen) in enumerate(self.trainset):
                     with tf.GradientTape() as tape:
                         # tape.watch(self.model.trainable_variables)
                         loss, losses, attn = \
@@ -97,8 +100,10 @@ class Trainer:
                             lr = lr(step)
                         tf.summary.scalar('common/lr', lr, step)
                         tf.summary.scalar('common/grad norm', norm, step)
-                        tf.summary.image(
-                            'align/mas', self.align_img(attn), step, max_outputs=1)
+
+                        if (iter + 1) % (self.trainsize // 10) == 0:
+                            tf.summary.image(
+                                'align/mas', self.align_img(attn), step, max_outputs=1)
 
             self.model.write(
                 '{}_{}.ckpt'.format(self.ckpt_path, epoch), self.optim)
