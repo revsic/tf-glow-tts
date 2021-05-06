@@ -13,6 +13,7 @@ from config import Config
 from datasets import TTSDataset
 from datasets.ljspeech import LJSpeech
 from glowtts import GlowTTS
+from utils.diffwave import pretrained_diffwave
 
 
 class Trainer:
@@ -58,6 +59,8 @@ class Trainer:
 
         self.cmap = tf.constant(
             plt.get_cmap('viridis').colors, dtype=tf.float32)
+
+        self.diffwave = pretrained_diffwave()
 
     def train(self, epoch: int = 0):
         """Train GlowTTS.
@@ -116,15 +119,20 @@ class Trainer:
                 tf.summary.image(
                     'align/mas', self.align_img(align), step, max_outputs=1)
 
-                mel, pmel, align = self.evaluate()
+                mel, pmel, audio, amel, align = self.evaluate()
                 tf.summary.image(
                     'mel/gt', self.mel_img(mel[None]), step)
                 tf.summary.image(
                     'mel/eval', self.mel_img(pmel[None]), step)
+                tf.summary.audio(
+                    'audio/eval', audio[None, ..., None],
+                    self.config.data.sr, step)
+                tf.summary.image(
+                    'mel/audio', self.mel_img(amel[None]), step)
                 tf.summary.image(
                     'align/duration', self.align_img(align[None]), step)
 
-                del text, mel, pmel, align, textlen, mellen
+                del text, mel, pmel, audio, align, textlen, mellen
 
     def eval_loss(self) -> Tuple[
             Dict[str, tf.Tensor],
@@ -153,7 +161,7 @@ class Trainer:
         return loss, (align, textlen, mellen)
 
     def evaluate(self, idx: Optional[int] = None) \
-            -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
+            -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor, tf.Tensor, tf.Tensor]:
         """Generate evaluation purpose audio.
         Args:
             idx: Optional[int], target index,
@@ -161,21 +169,27 @@ class Trainer:
         Returns:
             mel: [tf.float32; [T, mel]]: gt mel-spectrogram.
             pmel: [tf.float32; [T', mel]]: predicted mel.
+            audio: [tf.float32; [T' x hop]]: audio signal.
+            amel: [tf.float32; [T', mel]]: mel from generated audio.
             align: [tf.float32; [T' / F, S]],
                 align for text to mel.
         """
         if idx is None:
             idx = np.random.randint(self.config.data.batch)
-        # [B, S], [B, T, C], [B], [B]
+        # [B, S], [B, T, mel], [B], [B]
         text, mel, textlen, mellen = next(iter(self.testset))
         # [1, S]
         text = text[idx:idx + 1, :textlen[idx]]
-        # [1, T, C]
+        # [1, T, mel]
         mel = mel[idx:idx + 1, :mellen[idx]]
-        # [1, T', C], [1], [1, T' / F, S]
+        # [1, T', mel], [1], [1, T' / F, S]
         pmel, _, align = self.model(text, textlen[idx:idx + 1])
-        # [T, mel], [T', mel], [T' / F, S]
-        return mel[0], pmel[0], align[0]
+        # [1, T' x hop]
+        audio, _ = self.diffwave(pmel)
+        # [1, T', mel]
+        amel = self.ttsdata.mel_fn(audio)
+        # [T, mel], [T', mel], [T' x hop], [T', mel], [T' / F, S]
+        return mel[0], pmel[0], audio[0], amel[0], align[0]
 
     def align_img(self, align: tf.Tensor) -> tf.Tensor:
         """Generate alignment images.
