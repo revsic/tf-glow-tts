@@ -16,12 +16,10 @@ To download LJ-Speech dataset, run under script.
 Dataset will be downloaded in '~/tensorflow_datasets' in tfrecord format. If you want to change the download directory, specify `data_dir` parameter of `LJSpeech` initializer.
 
 ```python
-from dataset import LJSpeech
-from dataset.config import Config
+from dataset.ljspeech import LJSpeech
 
-config = Config()
-# lj = LJSpeech(config, data_dir=path, download=True)
-lj = LJSpeech(config, download=True) 
+# lj = LJSpeech(data_dir=path, download=True)
+lj = LJSpeech(download=True) 
 ```
 
 To train model, run [train.py](./train.py). 
@@ -30,7 +28,7 @@ Checkpoint will be written on `TrainConfig.ckpt`, tensorboard summary on `TrainC
 
 ```bash
 python train.py
-tensorboard --logdir ./log/
+tensorboard --logdir .\log
 ```
 
 If you want to train model from raw audio, specify audio directory and turn on the flag `--from-raw`.
@@ -42,7 +40,7 @@ python .\train.py --data-dir D:\LJSpeech-1.1\wavs --from-raw
 To start to train from previous checkpoint, `--load-step` is available.
 
 ```bash
-python .\train.py --load-step 416 --config ./ckpt/q1.json
+python .\train.py --load-epoch 20 --config D:\tf\ckpt\glowtts.json
 ```
 
 To inference test set, run [COMMING-SOON/inference.py](./inference.py).
@@ -68,7 +66,7 @@ tts.restore('./glowtts_20.ckpt-1').expect_partial()
 
 ## Learning Curve
 
-train 20 epochs with [tf-diffwave](https://github.com/revsic/tf-diffwave), l1-1M steps.
+train LJSpeech 20 epochs with [tf-diffwave](https://github.com/revsic/tf-diffwave)
 
 ![loss](./rsrc/loss.png)
 ![sample](./rsrc/image.jpg)
