@@ -1,9 +1,0 @@
-# python rt
-__pycache__
-
-# test files
-test.py
-
-# log, checkpoints
-log
-ckpt
