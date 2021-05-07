@@ -68,7 +68,7 @@ class GlowTTS(tf.keras.Model):
         # [B, T / F, M x F]
         mel = self.decoder.inverse(sample * mask[..., None], mask)
         # [B]
-        mellen = tf.reduce_sum(mask, axis=-1)
+        mellen = tf.cast(tf.reduce_sum(mask, axis=-1), tf.int32)
         # [B, T, M], [B]
         mel, mellen = self.unfold(mel, mellen)
         return mel, mellen, attn
