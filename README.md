@@ -43,13 +43,16 @@ To start to train from previous checkpoint, `--load-step` is available.
 python .\train.py --load-epoch 20 --config D:\tf\ckpt\glowtts.json
 ```
 
-To inference test set, run [COMMING-SOON/inference.py](./inference.py).
+To inference the audio, run [inference.py](./inference.py).
 
 ```bash
 python .\inference.py
+    --config D:\tf\ckpt\glowtts.json
+    --ckpt D:\tf\ckpt\glowtts\glowtts_20.ckpt-1
+    --text "Hello, my name is revsic"
 ```
 
-Pretrained checkpoints are relased on [COMMING-SOON/releases](https://github.com/revsic/tf-glow-tts/releases).
+Pretrained checkpoints are relased on [releases](https://github.com/revsic/tf-glow-tts/releases).
 
 To use pretrained model, download files and unzip it. Followings are sample script.
 
@@ -72,6 +75,6 @@ train LJSpeech 20 epochs with [tf-diffwave](https://github.com/revsic/tf-diffwav
 ![sample](./rsrc/image.jpg)
 
 
-## [COMMING-SOON] Samples
+## Samples
 
 Reference [https://revsic.github.io/tf-glow-tts](https://revsic.github.io/tf-glow-tts).
