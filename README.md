@@ -37,13 +37,14 @@ If you want to train model from raw audio, specify audio directory and turn on t
 python .\train.py --data-dir D:\LJSpeech-1.1\wavs --from-raw
 ```
 
-To start to train from previous checkpoint, `--load-step` is available.
+To start to train from previous checkpoint, `--load-epoch` is available.
 
 ```bash
 python .\train.py --load-epoch 20 --config D:\tf\ckpt\glowtts.json
 ```
 
-To inference the audio, run [inference.py](./inference.py).
+To inference the audio, run [inference.py](./inference.py). \
+Since this code is for POC, only alphabets and several special characters are available, reference [TextNormalizer.GRAPHEMES](./datasets/normalizer.py).
 
 ```bash
 python .\inference.py
